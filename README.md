@@ -1,9 +1,6 @@
 # Minimal EDF deadlines by convex hull
 
-This repository contains the C code to prune the unnecessary deadlines
-of an EDF scheduled real-time task. The theory supporting the
-implemented method is described into a paper submitted to the [RTCSA19](https://rtcsa2019.github.io/index/). If interested in
-getting a copy, please send me an email.
+This repository contains the C code to prune the unnecessary deadlines of an EDF scheduled real-time task. The theory supporting the implemented method is described into a paper submitted to the [RTCSA19](https://rtcsa2019.github.io/index/). If interested in getting a copy, please send me an email.
 
 ## Quick and dirty run
 
