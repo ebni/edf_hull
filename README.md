@@ -4,8 +4,7 @@ This repository contains the C code to prune the unnecessary deadlines of an EDF
 
 ## Quick and dirty run
 
-If you are lucky and want to run it first then understand it later, type
-the following commands:
+If you are lucky and want to run it first then understand it later, type the following commands:
 
 - `git clone https://github.com/ebni/edf_hull.git`
 - `cd edf_hull`
