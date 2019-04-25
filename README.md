@@ -3,16 +3,17 @@
 This repository contains the C code to prune the unnecessary deadlines
 of an EDF scheduled real-time task. The theory supporting the
 implemented method is described into a paper submitted to the
-[RTCSA19](link to conference). If interested in getting a copy, please
+[RTCSA19](https://rtcsa2019.github.io/index/). If interested in getting a copy, please
 send me an email.
 
 ## Quick and dirty run
 
 If you are lucky and want to first run it then understand it then type
 the following commands:
-- `git clone ....`
-- `cd ...`
-- make run
+- `git clone https://github.com/ebni/edf_hull.git`
+- `cd edf_hull`
+- `make run`
+
 Want to understand more? Just open the Makefile and go top-down. Or read next.
 
 ## Long story
