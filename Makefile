@@ -1,6 +1,7 @@
 qhull:
 	git clone https://github.com/qhull/qhull.git
 	mv qhull qhull-src
+	patch qhull-src/Makefile ./patch_M32
 	$(MAKE) -C qhull-src
 	ln -s qhull-src/bin/qhull
 
