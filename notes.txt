@@ -1,0 +1,88 @@
+At line 444, nella funzione
+
+void select_qhull_points(points_t * cur_points)
+
+viene invocato
+
+   	system("./qhull Fx TI data_in.txt TO data_out.txt");
+
+    Fx   - extreme points (in order for 2-d)\n\
+    TI file - input file, may be enclosed in single quotes\n\
+    TO file - output file, may be enclosed in single quotes\n\
+
+  qh_init_A(stdin, stdout, stderr, argc, argv);  /* sets qh qhull_command */
+
+definita in src/libqhull/global.c
+
+  qh_init_A( infile, outfile, errfile, argc, argv )
+    initialize memory and stdio files
+    convert input options to option string (qh.qhull_command)
+
+  notes:
+    infile may be NULL if qh_readpoints() is not called
+
+    errfile should always be defined.  It is used for reporting
+    errors.  outfile is used for output and format options.
+
+    argc/argv may be 0/NULL
+
+    called before error handling initialized
+    qh_errexit() may not be used
+
+
+qh_meminit(errfile);
+qh_initqhull_start(infile, outfile, errfile);
+  	memset((char *)&qh_qh, 0, sizeof(qhT));
+qh_init_qhull_command(argc, argv);
+	
+qh->qhull_command contiene esattamente
+"qhull Fx TI ../../data_in.txt TO ../../data_out.txt"
+
+siccome Fx allora
+
+qh_option(qh, "Fxtremes", NULL, NULL);
+qh_appendprint(qh, qh_PRINTextremes); /* forse solo per stampa su file */
+qh_option(qh, "TInput-file", NULL, NULL);
+qh_option(qh, "data_in.txt", NULL, NULL);
+qh_option(qh, "TOutput-file", NULL, NULL);
+qh_option(qh, "data_out.txt", NULL, NULL);
+
+A questo punto attraverso qh_option sono state caricate le opzioni in
+modo opportuno. Si passa quindi alla lettura dei punti con
+
+points= qh_readpoints(&numpoints, &dim, &ismalloc);  // versione non-reentrant
+
+che ritorna un (coordT *)
+
+dentro io_r.c
+
+diminput (dimensione dei vettori) = *dimension
+numinput (numero dei vettori) = *numpoints
+qh->normal_size = *dimension * sizeof(coordT) //spazio per mem un vettore
+
+con questa istruzione qua viene allocata la memoria per i punti (in io_r.c)
+
+  coords= points= qh->temp_malloc=  /* numinput and diminput >=2 by QH6220 */
+        (coordT *)qh_malloc((size_t)((*numpoints)*(*dimension))*sizeof(coordT));
+
+ad un certo punto points contiene tutti i punti
+return(points)
+
+numpoints: numero di punti
+dim: dimensione dei vettori
+points: puntatore a array di numpoints*dim elementi di tipo coordT
+
+e allora, belli tranquilli facciamo
+
+    qh_init_B(points, numpoints, dim, ismalloc); // non reentr
+    qh_init_B(qh, points, numpoints, dim, ismalloc); // non reentr
+
+con ismalloc = 1
+
+con il seguente si lancia
+
+    qh_qhull(qh);
+
+
+sarebbe da impostare un watchpoin su qh per fare break ogni volta che cambia valore
+
