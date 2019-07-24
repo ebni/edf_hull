@@ -5,8 +5,8 @@ qhull:
 	$(MAKE) -C qhull-src
 	ln -s qhull-src/bin/qhull
 
-edf_hull:	edf_hull.c
-	gcc edf_hull.c -o edf_hull -lm
+edf_hull:	edf_hull.c qh_init_struct.c
+	gcc edf_hull.c qh_init_struct.c qhull-src/lib/libqhullstatic_r.a -o edf_hull -lm
 
 run:	 qhull edf_hull
 	./edf_hull < task_set.txt

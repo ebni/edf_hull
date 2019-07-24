@@ -1,9 +1,16 @@
 #include      <stdlib.h>
 #include      <stdio.h>
 #include      <math.h>
+#include      <strings.h>
+#include      "qhull-src/src/libqhull_r/libqhull_r.h"
+#include      "qhull-src/src/libqhull_r/qhull_ra.h"
+
+extern 	qhT qh_qh;
 
 #define    MAX(a,b)      (a>b ? a : b)
 #define    MIN(a,b)      (a<b ? a : b)
+
+
 
 /*
  * Task set  related data. It  is preferred to store  homogeneous data
@@ -380,6 +387,22 @@ void print_points(const points_t* cur_points)
 	}
 }
 
+void init_qhull_struct(qhT * qh)
+{
+	int seed; 
+	qh->fin = stdin;
+	qh->fout = stdout;
+	qh->ferr = stderr;
+	qh->qhmem.ferr = stderr;
+	if ((qh->MINdenom_1 = 1.0/REALmax) < REALmin) {
+		qh->MINdenom_1 = REALmin;
+	}
+	seed= (int)time(NULL);
+	qh_RANDOMseed_(qh, seed);
+	qh->run_id= qh_RANDOMint;
+}
+
+
 /*
  * It selects the only necessary points using a geometric
  * reasoning. The algorithm for computing the convex hull is invoked
@@ -393,7 +416,14 @@ void select_qhull_points(points_t * cur_points)
 	FILE* selection_file;
 	int i,j;
 	double sum_coef, mul_factor;
+	/* We aim at simulating to "qhull Fx TI data_in.txt TO data_out.txt" */
+	qhT * qh;
+
 	
+	/* part of the initialization is copied in tent_init_qh.c  */
+	
+	/* setting the pointer to the qhull data structure */
+	qh = &qh_qh;
 	/* open/create the file in write mode */
 	points_file = fopen("data_in.txt","w");
 	
@@ -512,6 +542,7 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
 	print_points(&my_points);
 #endif
+	init_qhull_struct(&qh_qh);
 	select_qhull_points(&my_points);
 	
 	free_all();
