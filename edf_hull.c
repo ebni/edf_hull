@@ -2,6 +2,7 @@
 #include      <stdio.h>
 #include      <math.h>
 #include      <strings.h>
+#include      <setjmp.h>  /* Necessary to set qh->errexit */
 #include      "qhull-src/src/libqhull_r/libqhull_r.h"
 #include      "qhull-src/src/libqhull_r/qhull_ra.h"
 
@@ -389,7 +390,8 @@ void print_points(const points_t* cur_points)
 
 void init_qhull_struct(qhT * qh)
 {
-	int seed; 
+	int seed, exitcode;
+  
 	qh->fin = stdin;
 	qh->fout = stdout;
 	qh->ferr = stderr;
@@ -400,6 +402,8 @@ void init_qhull_struct(qhT * qh)
 	seed= (int)time(NULL);
 	qh_RANDOMseed_(qh, seed);
 	qh->run_id= qh_RANDOMint;
+	exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
+	qh_initstatistics(qh);
 }
 
 
@@ -424,6 +428,10 @@ void select_qhull_points(points_t * cur_points)
 	
 	/* setting the pointer to the qhull data structure */
 	qh = &qh_qh;
+	qh->normal_size = cur_points->num_tasks * sizeof(coordT); /* (# elements in vector) * (size of each element)  */
+	/* maxline is length of some string. 500 is MAGIC number copied from qhull code */
+	qh->maxline = 500 > (cur_points->num_tasks*(qh_REALdigits + 5)) ? 500 : (cur_points->num_tasks*(qh_REALdigits + 5));
+
 	/* open/create the file in write mode */
 	points_file = fopen("data_in.txt","w");
 	

@@ -1,3 +1,5 @@
+CFLAGS="-O0 -g"
+
 qhull:
 	git clone https://github.com/qhull/qhull.git
 	mv qhull qhull-src
@@ -5,7 +7,7 @@ qhull:
 	$(MAKE) -C qhull-src
 	ln -s qhull-src/bin/qhull
 
-edf_hull:	edf_hull.c qh_init_struct.c
+edf_hull:	edf_hull.c qh_init_struct.c Makefile
 	gcc edf_hull.c qh_init_struct.c qhull-src/lib/libqhullstatic_r.a -o edf_hull -lm
 
 run:	 qhull edf_hull
