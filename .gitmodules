@@ -1,0 +1,3 @@
+[submodule "modules/qhull"]
+	path = modules/qhull
+	url = git@github.com:qhull/qhull.git

@@ -6,13 +6,13 @@ This repository contains the C code to prune the unnecessary deadlines of an EDF
 
 This work is dedicated to the memory of Laurent George, who prematurely passed away. Laurent, together with Jean-François Hermant, proposed a Linear Programming (LP) based method to reduce the number of points in the following paper
 
-- George, Laurent, and Jean-François Hermant. "Characterization of the space of feasible worst-case execution times for earliest-deadline-first scheduling." Journal of Aerospace Computing, Information, and Communication 6.11 (2009): 604-623.
+- George, Laurent, and Hermant, Jean-François. "Characterization of the space of feasible worst-case execution times for earliest-deadline-first scheduling." Journal of Aerospace Computing, Information, and Communication 6.11 (2009): 604-623.
 
 ## Quick and dirty run
 
 If you are lucky and want to run it first then understand it later, type the following commands:
 
-- `git clone git@github.com:ebni/edf_hull.git`
+- `git clone --recurse-submodules git@github.com:ebni/edf_hull.git`
 - `cd edf_hull`
 - `make run`
 

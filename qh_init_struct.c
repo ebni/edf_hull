@@ -1,4 +1,4 @@
-#include      "qhull-src/src/libqhull_r/libqhull_r.h"
+#include      "modules/qhull/src/libqhull_r/libqhull_r.h"
 #include      <limits.h>
 
 qhT qh_qh = {
