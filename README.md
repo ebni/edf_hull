@@ -1,12 +1,18 @@
 # Minimal EDF deadlines by convex hull
 
-This repository contains the C code to prune the unnecessary deadlines of an EDF scheduled real-time task. The theory supporting the implemented method is described into a paper submitted to the [RTCSA19](https://rtcsa2019.github.io/index/). If interested in getting a copy, please send me an email.
+This repository contains the C code to prune the unnecessary deadlines of an EDF scheduled real-time task. The theory supporting the implemented method is published in the following paper
+
+- Bini, Enrico. "Cutting the Unnecessary Deadlines in EDF." Proceedings of the 25th IEEE International Conference on Embedded and Real-Time Computing Systems and Applications (RTCSA). 2019. DOI: [10.1109/RTCSA.2019.8864569](https://doi.org/10.1109/RTCSA.2019.8864569). *Outstanding paper award*
+
+This work is dedicated to the memory of Laurent George, who prematurely passed away. Laurent, together with Jean-François Hermant, proposed a Linear Programming (LP) based method to reduce the number of points in the following paper
+
+- George, Laurent, and Jean-François Hermant. "Characterization of the space of feasible worst-case execution times for earliest-deadline-first scheduling." Journal of Aerospace Computing, Information, and Communication 6.11 (2009): 604-623.
 
 ## Quick and dirty run
 
 If you are lucky and want to run it first then understand it later, type the following commands:
 
-- `git clone https://github.com/ebni/edf_hull.git`
+- `git clone git@github.com:ebni/edf_hull.git`
 - `cd edf_hull`
 - `make run`
 
@@ -28,13 +34,12 @@ guarantee EDF schedulability. This action is made by the following steps:
 The parameters of the tasks are read from `stdin` in the following order:
 
 1. the number of tasks (integer)
-1. for task period, deadline, and offset are read (double). If tasks have no offset, then it must be specified `0` as third task parameter.
+1. sensitivity of the hyperperiod
+1. for each task period, deadline, and offset are read (double). If tasks have no offset, then it must be specified `0` as third task parameter.
 
 Notice that the parameters are read as floating point numbers. Hence,
 the least common multiple among periods (often called hyperperiod in
-the literature) is computed with a tolerance: two floating point
-numbers differing by less than a compile-time macro `EPS` are declared
-equal. More details in the function `double lcm_double(double, double)`
+the literature) is computed with a tolerance specified as second parameter.
 
 ### Creating the constraints
 

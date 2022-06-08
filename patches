@@ -1,0 +1,17 @@
+Common subdirectories: qhull-orig/build and qhull-src/build
+Common subdirectories: qhull-orig/eg and qhull-src/eg
+Common subdirectories: qhull-orig/.git and qhull-src/.git
+Common subdirectories: qhull-orig/html and qhull-src/html
+diff -ub qhull-orig/Makefile qhull-src/Makefile
+--- qhull-orig/Makefile	2022-06-08 16:21:19.280498853 +0200
++++ qhull-src/Makefile	2022-06-08 16:22:11.724848857 +0200
+@@ -782,7 +782,7 @@
+ 	@echo -e '==   "make SO=dll" and copy lib/libqhull_r.dll to bin/'
+ 	@echo -e '== Otherwise if user_eg fails to link, switch to -lqhullstatic_r'
+ 	@echo -e '===================================================\n'
+-	$(CC) -o $@ $< $(CC_OPTS1) $(CC_OPTS3) -Llib -lqhull_r -lm
++	$(CC) -o $@ $< $(CC_OPTS1) $(CC_OPTS3) -Llib -lqhullstatic_r -lm
+ 
+ bin/user_eg2: src/user_eg2/user_eg2_r.o lib/libqhullstatic_r.a
+ 	@echo -e '\n\n==================================================='
+Common subdirectories: qhull-orig/src and qhull-src/src
