@@ -146,7 +146,11 @@ qhT qh_qh = {
 	.WIDEfacet = 0,
 	.qhull = "qhull",
 	.jmpXtra = {0},
-	.restartexit = {{.__jmpbuf = {0}, .__mask_was_saved = 0, .__saved_mask = {.__val = {0}}}},
+	/*
+	 * EB: size of jump buffer is arch-dependent. Commenting it
+	 * away
+	 */
+	/*	.restartexit = {{.__jmpbuf = {0}, .__mask_was_saved = 0, .__saved_mask = {.__val = {0}}}}, */
 	.jmpXtra2 = {0},
 	.interior_point = 0x0,
 	.center_size = 0,
@@ -227,9 +231,13 @@ qhT qh_qh = {
 	.mergereport = 0,
 	.old_tempstack = 0x0,
 	.ridgeoutnum = 0,
-	.rbox_errexit = {{.__jmpbuf = {0, 0, 0, 0, 0, 0, 0, 0},
+	/*
+	 * EB: size of jump buffer is arch-dependent. Commenting it
+	 * away
+	 */
+	/*.rbox_errexit = {{.__jmpbuf = {0, 0, 0, 0, 0, 0, 0, 0},
 			  .__mask_was_saved = 0,
-			  .__saved_mask = {.__val = {0}}}},
+			  .__saved_mask = {.__val = {0}}}}, */
 	.jmpXtra3 = {0},
 	.rbox_isinteger = 0,
 	.rbox_out_offset = 0,
