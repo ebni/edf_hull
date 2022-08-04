@@ -62,6 +62,7 @@ static void compute_hyperperiod(ts_t* cur_ts)
 	H = multi[id_min];
 	cur_ts->h_per_tol = multi[id_max]/multi[id_min]-1;
 	free(jobs);
+	free(multi);
 }
 
 /*

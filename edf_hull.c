@@ -3,6 +3,8 @@
 #include      <math.h>
 #include      "edf_hull.h"
 
+#define IND (cur_points->vec_sel[i])
+
 void edf_set_zero(edf_points_t* cur_points)
 {
 	cur_points->alloc_points = 0;
@@ -178,10 +180,10 @@ void edf_create_points(const ts_t* cur_task_set,
 				/* t0 is zero, when no offset */
 				cur_points->t0[point_count] = 0;
 				/* t1 is equal to the j-th deadline of task i */
-				cur_points->t1[point_count] = cur_t = O(i)+j*T(i)+D(i);
+				cur_points->t1[point_count] = cur_t = j*T(i)+D(i);
 				for(k=0; k<N; k++) {
 					/* there may be numerical problems... */
-					coef = floor((cur_t-O(k)-D(k))/T(k))+1;
+					coef = floor((cur_t-D(k))/T(k))+1;
 					/* must be non-negative */
 					if (coef < 0)
 						coef = 0;
@@ -242,6 +244,62 @@ static void trans_points(edf_points_t* cur_points)
 	}
 }
 
+/* 
+* Prints the selection in the following format
+* 
+* t0    t1    a_1    a_2    ...    a_N
+*
+* For each row the test that is necessary (and sufficient) to run
+* is
+* 
+* a_1*C_1 +a_2*C_2 + ... +a_N*C_N <= t_1-t_0
+*/
+void edf_print_constraints_C(const edf_points_t * cur_points){
+	int i,j;
+	printf("\nMinimal set of constraints are written in the following form\n\n");
+	printf("    eta_1*C_1 +eta_2*C_2 + ... +eta_N*C_N <= t_1-t_0\n\n");
+	for(j=0; j<cur_points->num_tasks; j++) {
+		printf("eta_%d\t", j+1);
+	}
+	printf("t1\tt0\n");
+	for(i=0; i<cur_points->num_sel; i++) {
+		for(j=0; j<cur_points->num_tasks; j++) {
+			printf("%.4f\t",cur_points->vec_p[IND*cur_points->num_tasks+j]);
+		}
+		printf("%.0f\t%.0f\n", cur_points->t1[IND], cur_points->t0[IND]);
+	}
+}
+
+void edf_print_constraints_U(const ts_t* cur_task_set, const edf_points_t * cur_points){
+	int i,j;
+	printf("\nOr, alternatively, minimal set of constraints can also be written as\n\n");
+	printf("    eta_1*U_1 +eta_2*U_2 + ... +eta_N*U_N <= t_1-t_0\n\n");
+	for(j=0; j<cur_points->num_tasks; j++) {
+		printf("eta_%d\t", j+1);
+	}
+	printf("t1\tt0\n");
+
+
+#define     T(j)       (cur_task_set->per[j])
+	for(i=0; i<cur_points->num_sel; i++) {
+		for(j=0; j<cur_points->num_tasks; j++) {
+			if(i < cur_points->num_tasks){
+				printf("%.4f\t",cur_points->vec_p[IND*cur_points->num_tasks+j]*(1/T(j)));
+			} else {
+				printf("%.4f\t",
+				(cur_points->vec_p[IND*cur_points->num_tasks+j]*T(j))/cur_points->t1[IND]);
+			}
+		}
+		if(cur_points->t1[IND]!=0)
+			printf("%.0f\t%.0f\n", cur_points->t1[IND]/cur_points->t1[IND], cur_points->t0[IND]);
+		else 
+			printf("%.0f\t%.0f\n", cur_points->t1[IND], cur_points->t0[IND]);
+
+
+#undef 	T
+	}
+}
+
 void edf_print_points(const edf_points_t* cur_points)
 {
 	int i,j;
@@ -260,35 +318,11 @@ void edf_print_points(const edf_points_t* cur_points)
 		}
 		printf("\n");
 	}
-	/* 
-	 * Print the selection in the following format
-	 * 
-	 * t0    t1    a_1    a_2    ...    a_N
-	 *
-	 * For each row the test that is necessary (and sufficient) to run
-	 * is
-	 * 
-	 * a_1*C_1 +a_2*C_2 + ... +a_N*C_N <= t_1-t_0
-	 */
-	printf("Minimal set of constraints are written in the following form\n\n");
-	printf("    eta_1*C_1 +eta_2*C_2 + ... +eta_N*C_N <= t_1-t_0\n\n");
-	printf("t0\tt1");
-	for(j=0; j<cur_points->num_tasks; j++) {
-		printf("\teta_%d", j+1);
-	}
-	printf("\n");
-	for(i=0; i<cur_points->num_sel; i++) {
-#define IND (cur_points->vec_sel[i])
-		printf("%.0f\t%.0f",cur_points->t0[IND], cur_points->t1[IND]);
-		for(j=0; j<cur_points->num_tasks; j++) {
-			printf("\t%.4f",cur_points->vec_p[IND*cur_points->num_tasks+j]);
-		}
-		printf("\n");
-#undef IND
-	}
 	
-
+	edf_print_constraints_C(cur_points);
 }
+
+
 
 #ifdef USE_QHULL_LIB
 /*
@@ -296,14 +330,15 @@ void edf_print_points(const edf_points_t* cur_points)
  * unless you know what you are doing. (EB: I knew very little when I
  * did this and it seemed to work by miracle)
  */
-static void init_qhull_struct(qhT * qh)
+static void init_qhull_struct(qhT * qh, FILE *debug_file)
 {
 	int seed, exitcode;
   
 	qh->fin = stdin;
-	qh->fout = stdout;
-	qh->ferr = stderr;
-	qh->qhmem.ferr = stderr;
+	qh->fout = debug_file;
+	qh->ferr = debug_file;
+	qh->qhmem.ferr = debug_file;
+	qh->POINTSmalloc = True;
 	if ((qh->MINdenom_1 = 1.0/REALmax) < REALmin) {
 		qh->MINdenom_1 = REALmin;
 	}
@@ -313,6 +348,42 @@ static void init_qhull_struct(qhT * qh)
 	exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
 	qh_initstatistics(qh);
 }
+
+
+/**
+ * Fills array vec_sel with indexes of the selected points. Makes use of 
+ * a set data structure to sort vertices by id. 
+*/
+void edf_array_indexes(qhT * qh, int * arr)
+{
+	setT *vertices, *points;
+	pointT *point;
+	vertexT *vertex, **vertexp;
+	int id, count_points = 0;
+	int numpoints=0, point_i, point_n;
+	int allpoints= qh->num_points + qh_setsize(qh, qh->other_points);
+
+	points= qh_settemp(qh, allpoints);
+	qh_setzero(qh, points, 0, allpoints);
+	vertices= qh_facetvertices(qh, qh->facet_list, NULL, 0);
+	FOREACHvertex_(vertices) {
+		id= qh_pointid(qh, vertex->point);
+		if (id >= 0) {
+		SETelem_(points, id)= vertex->point;
+		numpoints++;
+		}
+	}
+	qh_settempfree(qh, &vertices);
+	FOREACHpoint_i_(qh, points) {
+		if (point)
+		{
+			arr[count_points] = point_i;
+			count_points++;
+		}
+	}
+	qh_settempfree(qh, &points);
+} 
+
 #endif /* USE_QHULL_LIB */
 
 /*
@@ -324,9 +395,11 @@ static void init_qhull_struct(qhT * qh)
 void edf_qhull_points(edf_points_t * cur_points)
 {
 	int i,j;
+	int curlong, totlong; 
 #ifdef USE_QHULL_LIB
 	/* We aim at simulating to "qhull Fx TI data_in.txt TO data_out.txt" */
 	qhT * qh;
+	FILE * debug_file;
 #else
 	/* Using text file as interface with the qhull executable */
 	FILE * points_file;
@@ -344,8 +417,11 @@ void edf_qhull_points(edf_points_t * cur_points)
 	 *   (2) by invoking the function init_qhull_struct(qh)
 	 *   (3) in the next few lines
 	 */
+
+	debug_file = fopen("edf_debug_qhull.txt","w");
+
 	/* setting the pointer to the qhull data structure (global variable) */
-	init_qhull_struct(&qh_qh);
+	init_qhull_struct(&qh_qh, debug_file);
 
 	qh = &qh_qh;
 	qh->normal_size = cur_points->num_tasks * sizeof(coordT);
@@ -356,10 +432,11 @@ void edf_qhull_points(edf_points_t * cur_points)
 		  cur_points->qh_vec_p,      /* array of coordinates */
 		  cur_points->num_points,   /* number of vectors */
 		  cur_points->num_tasks,    /* dimension of vectors */
-		  1);                       /* true is vec_p is allocated */
+		  qh->POINTSmalloc);		/* true is vec_p is allocated*/
 
 	/* Finally invoking the power of qhull */
 	qh_qhull(qh);
+
 	/*
 	 * At this point the solution is stored as follows (more
 	 * details in qhull-src/src/libqhull_r/libqhull_r.h for the
@@ -374,6 +451,7 @@ void edf_qhull_points(edf_points_t * cur_points)
 	 *   p->point
 	 */
 	cur_points->num_sel = qh->num_vertices;
+
 	/*
 	 * Una cosa buona da fare sembra invocare 
 	 *
@@ -389,7 +467,18 @@ void edf_qhull_points(edf_points_t * cur_points)
 	/* FIXME, TODO: to get from the qhull data struct the indices
 	 * of the vertices. Below NULL should be replaced by a proper
 	 * array with the right indices of vertices */
-	cur_points->vec_sel = NULL;
+
+
+	cur_points->vec_sel = (int*)malloc(sizeof(int)*(cur_points->num_sel));
+	  
+	edf_array_indexes(qh, cur_points->vec_sel);
+
+	/*Freeing memory related to qhull, including array of coordinates*/
+	qh_freebuffers(qh);
+	qh_memfreeshort(qh,&curlong,&totlong);
+
+	fclose(debug_file);
+
 #else  /* not USE_QHULL_LIB */
 	/* open/create the file in write mode */
 	points_file = fopen("data_in.txt","w");
@@ -442,31 +531,6 @@ void edf_qhull_points(edf_points_t * cur_points)
 	/* load the index of the points */
 	for(i=0; i<cur_points->num_sel; i++) {
 	fscanf(selection_file,"%d\n", &(cur_points->vec_sel[i]));
-}
-	
-	/* 
-	 * Print the selection in the following format
-	 * 
-	 * t0    t1    a_1    a_2    ...    a_N
-	 *
-	 * For each row the test that is necessary (and sufficient) to run
-	 * is
-	 * 
-	 * a_1*C_1 +a_2*C_2 + ... +a_N*C_N <= t_1-t_0
-	 */
-	printf("Minimal set of constraints are written in the following form\n\n");
-	printf("    eta_1*C_1 +eta_2*C_2 + ... +eta_N*C_N <= t_1-t_0\n\n");
-	for(j=0; j<cur_points->num_tasks; j++) {
-		printf("eta_%d\t", j+1);
-	}
-	printf("t1\tt0\n");
-	for(i=0; i<cur_points->num_sel; i++) {
-#define IND (cur_points->vec_sel[i])
-		for(j=0; j<cur_points->num_tasks; j++) {
-			printf("%.4f\t",cur_points->vec_p[IND*cur_points->num_tasks+j]);
-		}
-		printf("%.0f\t%.0f\n", cur_points->t1[IND], cur_points->t0[IND]);
-#undef IND
 	}
 	
 	/* close the file */
@@ -474,11 +538,13 @@ void edf_qhull_points(edf_points_t * cur_points)
 #endif /* USE_QHULL_LIB */
 }
 
+
+
 void edf_free_points(edf_points_t * cur_points)
 {
 	free(cur_points->t0);
 	free(cur_points->t1);
 	free(cur_points->vec_p);
 	free(cur_points->vec_sel);
-	free(cur_points->qh_vec_p);
+	/*free(cur_points->qh_vec_p);*/
 }

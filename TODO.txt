@@ -28,3 +28,7 @@ per cercare di capire cosa ci fa qhull con i file, al fine di bypassare scrittur
 
 https://github.com/qhull/qhull
 
+RECAP: 
+- aggiunta stampa alternativa 
+- correzione memoria dinamica (free)
+- elenco chiamate di funzione in comando run (vedi debug_notes.txt)

@@ -91,6 +91,8 @@ void main_input_task(char * argv[])
 		edf_print_points(&my_points);
 	}
 	edf_qhull_points(&my_points);
+	edf_print_constraints_C(&my_points);
+	edf_print_constraints_U(&my_task_set,&my_points);
 	edf_free_points(&my_points);
 	ts_free(&my_task_set);
 }

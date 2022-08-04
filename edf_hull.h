@@ -7,7 +7,7 @@
  * to the appropriate structure. They are only counted.
  */
 
-/*#define USE_QHULL_LIB*/
+#define USE_QHULL_LIB
 
 #include      "ts_lib.h"     /* task set basic routines */
 
@@ -15,8 +15,10 @@
 
 #include      <strings.h>
 #include      <setjmp.h>  /* Necessary to set qh->errexit */
-#include      "qhull-src/src/libqhull_r/qhull_ra.h"
-#include      "qhull-src/src/libqhull_r/libqhull_r.h"
+#include      "modules/qhull/src/libqhull_r/qhull_ra.h"
+#include      "modules/qhull/src/libqhull_r/libqhull_r.h"
+#include 		"modules/qhull/src/libqhull_r/mem_r.h"
+
 
 /* Qhull global data structure necessary to cut points */
 extern qhT qh_qh;  /* defined in qh_init_struct.c */
@@ -68,6 +70,11 @@ void edf_create_points(const ts_t* cur_task_set,
  */
 void edf_print_points(const edf_points_t* cur_points);
 
+
+void edf_print_constraints_C(const edf_points_t * cur_points);
+
+
+void edf_print_constraints_U(const ts_t* cur_task_set, const edf_points_t * cur_points);
 /*
  * It selects the only necessary points using a geometric
  * reasoning. The algorithm for computing the convex hull is invoked

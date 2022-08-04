@@ -57,7 +57,7 @@ void ts_rand(ts_t* cur_ts, const ts_rand_t * settings, int num);
 void ts_realloc(ts_t* cur_ts);
 
 /*
- * Initialize the task set reading from stdin
+ * Initialize the task set using data read from stdin
  */
 void ts_read_alloc(ts_t* cur_ts);
 
