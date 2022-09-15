@@ -74,6 +74,8 @@ void main_input_task(char * argv[])
 	edf_points_t my_points;
 	int verbose;
 
+	/* true if invoked by ./edf_hull_main iv*, meaning that the
+	   second char must be 'v'*/
 	verbose = argv[0] != NULL && argv[0][1] == 'v';
 	
 	/* Initialization */
@@ -121,21 +123,21 @@ void main_seed(char * argv[])
 
 	/* Read from stdin the setup */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%ud", &rand_setup.seed);
+	sscanf(s, "%ud", &rand_setup.seed); /* --rand-seed 1234567 (controllare che sia numero) required_argument */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%d", &num_tasks);
+	sscanf(s, "%d", &num_tasks);        /* --num 5 required_argument */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%lf", &rand_setup.per_min);
+	sscanf(s, "%lf", &rand_setup.per_min); /* --period-min 10 required_argument */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%lf", &rand_setup.per_max);
+	sscanf(s, "%lf", &rand_setup.per_max); /* --period-max 30 required_argument */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%i", &rand_setup.phasing);
+	sscanf(s, "%i", &rand_setup.phasing);  /* --phasing no_argument  */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%lf", &rand_setup.norm_dl_avg);
+	sscanf(s, "%lf", &rand_setup.norm_dl_avg); /* --relative-dl-avg 1 required */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%lf", &rand_setup.norm_dl_var);
+	sscanf(s, "%lf", &rand_setup.norm_dl_var);   /* --relative-dl-var 0.1 required */
 	getdelim(&s, &dim, ',', stdin);
-	sscanf(s, "%lf", &my_task_set.eps);
+	sscanf(s, "%lf", &my_task_set.eps); /* --eps 1e-6 required */
 	
 	/* Generate the task set */
 	ts_rand(&my_task_set, &rand_setup, num_tasks);
