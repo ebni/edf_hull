@@ -28,13 +28,16 @@ typedef enum {
 
 typedef struct {
 	per_method_t    per_m;        /* method for period generation */
+	int 			num;	      /* number of tasks to be generated */
 	unsigned int    seed;         /* seed for random num generator */
 	double          per_min;      /* stored in double, may be integers */
 	double          per_max;      /* stored in double, may be integers */
 	double          norm_dl_avg;  /* normalized deadline: average */
 	double          norm_dl_var;  /* norm_dl is in [avg-var,avg+var] */
 	int             phasing;      /* 1 if offset; 0 if not */
+    double 			eps;		  /* (t_1-t_0)/t_1 < eps => t_1, t_0 are same */
 } ts_rand_t;
+
 
 
 /*
@@ -44,10 +47,9 @@ void ts_set_zero(ts_t* cur_ts);
 
 /*
  * Generate (and allocate if needed) a random set of num tasks based
- * on the settings in (ts_rand_t*)settings. If the new number of tasks
- * (num) is not equal to old value
+ * on the settings in (ts_rand_t*)settings. 
  */
-void ts_rand(ts_t* cur_ts, const ts_rand_t * settings, int num);
+void ts_rand(ts_t* cur_ts, const ts_rand_t * settings);
 
 /*
  * Allocate arrays for task set. The size is taken from
@@ -59,7 +61,7 @@ void ts_realloc(ts_t* cur_ts);
 /*
  * Initialize the task set using data read from stdin
  */
-void ts_read_alloc(ts_t* cur_ts);
+void ts_read_alloc(ts_t* cur_ts, char *input_filename);
 
 /*
  * Print the data of the task set
