@@ -111,26 +111,28 @@ The program then computes the minimal set of constraints to guarantee EDF schedu
 
 The two tables above represent the same set of constraints. They are to be read as follows:
 
-* The first represents each constraint in the following form: 
+* The table on the left represents each constraint in the following form: 
 
     $\eta_1 * C_1 + \eta_2 * C_2 ... + \eta_n * C_n <= t_1 - t_0$ 
     
-    where $C_i$ is the execution time of the $i$-th task and $t_1 - t_0$ is the absolute deadline.  So, for example the first row of the first table represents the constraint $$-C_1 <= 0$$ which is equivalent to $C_1 >= 0$. While, the fourth row is the constraint $$3*C_1 + 3*C_2 <= 10$$.
+    where
+    * $C_i$ is the execution time of the $i$-th task
+    * $[t_0,t_1]$ is the interval where EDF schedulability is checked, and
+    * $\eta_i$ is the number of jobs of the $i$-th task with both activation and deadline in the interval $[t_0,t_1]$
+    
+    For example, the fourth row represents the constraint $$3*C_1 + 3*C_2 <= 10$$ because the interval $[0,10]$ contains 3 jobs of both tasks.
 
-* The second type of format displays each constraint in the following form: 
+    The first row, instead, represents the constraint $$-C_1 <= 0$$ which is equivalent to $C_1 >= 0$.
+
+* The table on the right represents the same information in a normalized format: 
 
     $a_1 * U_1 + a_2 * U_2 + ... + a_n * U_n <= 1$
 
-    where $U_i$ is the utilization of the $i$-th task.
-    This notation is extensively used in [Bini's paper](https://doi.org/10.1109/RTCSA.2019.8864569).
-
-    Let's take the fourth row of the second table as an example. The respective constraint is $$0.9*U_1 + 1.2*U_2 <= 1$$.
-
-Since $\eta_i = \frac{a_i}{T_i}* (t_1-t_0)$ and  $C_i = T_i * U_i $ , the two formats are equivalent. 
+    where $U_i$ is the utilization of the $i$-th task and $a_i$ is computed to have 1 at the RHS (please refer to the above mentioned paper for details).
 
 The first _n_ rows will always represent the [positivity constraints](#creating-the-constraints), which guarantee a non-negative execution time for each task _i_$$ - C_i <= 0$$ while the _n+1_-th might be the [total utilization constraint](#creating-the-constraints) (unless it's not included among the minimal set of constraint by the procedure).
 
-The last column is zero in this case because there are no offset by default.
+The last column is zero because there is no offset in this example.
 
 ## How does it work
 
