@@ -291,7 +291,7 @@ void create_descriptive_filename(char *filename) {
     break;
   }
 
-  sprintf(filename, "../datasets/new/%s_t%.0f-%.0f_d_avg%.1f-var%.1f.csv\0",
+  sprintf(filename, "../datasets/new/%s_t%.0f-%.0f_d_avg%.1f-var%.1f.csv",
           n_repeats, arguments.rand_setup.per_min, arguments.rand_setup.per_max,
           arguments.rand_setup.norm_dl_avg, arguments.rand_setup.norm_dl_var);
 }
