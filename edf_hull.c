@@ -442,7 +442,8 @@ unsigned int edf_linprog_points(edf_points_t *cur_points, unsigned int disp) {
          cur_points->t1[index]-cur_points->t0[index]);
       }
 #else
-      if (glp_get_obj_val(lp) > cur_points->t1[index]-cur_points->t0[index] + e) {
+      if (glp_get_obj_val(lp) > cur_points->t1[index]-cur_points->t0[index] + e
+            || glp_get_status(lp) == GLP_UNBND) {
          /* Add again the correct RHS of tested constraint. */
          glp_set_row_bnds(lp, i, GLP_UP, 0,
          cur_points->t1[index]-cur_points->t0[index]);
